@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apple Afterlife</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --white: #ffffff;
+    --off-white: #f8f7f5;
+    --warm-gray: #e8e5e0;
+    --mid-gray: #9a9590;
+    --dark-gray: #3a3630;
+    --black: #1a1814;
+    --accent: #2c2c2c;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--white);
+    color: var(--black);
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px;
+    height: 52px;
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 400; color: var(--black); text-decoration: none; }
+  .nav-logo svg { width: 18px; height: 18px; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { font-size: 12px; color: var(--dark-gray); text-decoration: none; letter-spacing: 0.02em; }
+  .nav-links a span.en { display: block; font-size: 10px; color: var(--mid-gray); margin-top: 1px; }
+  .nav-cta {
+    background: var(--black); color: var(--white);
+    padding: 8px 18px; border-radius: 20px;
+    font-size: 12px; text-decoration: none; letter-spacing: 0.03em;
+    transition: opacity 0.2s;
+  }
+  .nav-cta:hover { opacity: 0.8; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 52px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-left {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 80px 60px 80px 80px;
+  }
+  .hero-title-zh {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(36px, 4.5vw, 58px);
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--black);
+    margin-bottom: 12px;
+  }
+  .hero-title-en {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 3.5vw, 44px);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--dark-gray);
+    line-height: 1.3;
+    margin-bottom: 32px;
+  }
+  .hero-desc-zh {
+    font-size: 14px;
+    line-height: 2;
+    color: var(--dark-gray);
+    margin-bottom: 6px;
+    letter-spacing: 0.05em;
+  }
+  .hero-desc-en {
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--mid-gray);
+    margin-bottom: 44px;
+    letter-spacing: 0.01em;
+  }
+  .hero-buttons { display: flex; align-items: center; gap: 20px; }
+  .btn-primary {
+    background: var(--black); color: var(--white);
+    padding: 14px 28px; border-radius: 24px;
+    font-size: 14px; text-decoration: none;
+    letter-spacing: 0.03em;
+    transition: opacity 0.2s;
+  }
+  .btn-primary:hover { opacity: 0.8; }
+  .btn-secondary {
+    font-size: 14px; color: var(--black);
+    text-decoration: none; letter-spacing: 0.03em;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-secondary::after { content: '›'; font-size: 18px; }
+
+  .hero-right {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--off-white);
+  }
+  .hero-right img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .scroll-indicator {
+    position: absolute; bottom: 32px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px; z-index: 10;
+  }
+  .scroll-dot {
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, transparent, var(--dark-gray));
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; } 50% { opacity: 1; }
+  }
+
+  /* FEATURES */
+  .features {
+    padding: 80px 80px;
+    border-top: 1px solid var(--warm-gray);
+    border-bottom: 1px solid var(--warm-gray);
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 40px;
+  }
+  .feature-item { text-align: center; }
+  .feature-icon {
+    width: 48px; height: 48px;
+    margin: 0 auto 16px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--dark-gray);
+  }
+  .feature-icon svg { width: 28px; height: 28px; stroke-width: 1.2; }
+  .feature-name-zh {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14px; font-weight: 400;
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+  }
+  .feature-name-en {
+    font-size: 11px; color: var(--mid-gray);
+    margin-bottom: 12px; letter-spacing: 0.03em;
+  }
+  .feature-desc-zh { font-size: 12px; color: var(--dark-gray); line-height: 1.8; margin-bottom: 6px; }
+  .feature-desc-en { font-size: 11px; color: var(--mid-gray); line-height: 1.7; }
+
+  /* AI SECTION */
+  .ai-section {
+    padding: 100px 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    background: var(--white);
+  }
+  .ai-left {}
+  .tag {
+    display: inline-block;
+    border: 1px solid var(--warm-gray);
+    padding: 4px 12px; border-radius: 12px;
+    font-size: 11px; color: var(--mid-gray);
+    letter-spacing: 0.06em;
+    margin-bottom: 24px;
+  }
+  .section-title-zh {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(24px, 3vw, 38px);
+    font-weight: 400;
+    line-height: 1.4;
+    margin-bottom: 10px;
+  }
+  .section-title-en {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(20px, 2.4vw, 30px);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--dark-gray);
+    line-height: 1.4;
+    margin-bottom: 28px;
+  }
+  .section-desc-zh { font-size: 14px; color: var(--dark-gray); line-height: 2; margin-bottom: 8px; letter-spacing: 0.04em; }
+  .section-desc-en { font-size: 13px; color: var(--mid-gray); line-height: 1.8; margin-bottom: 36px; }
+  .learn-more {
+    font-size: 13px; color: var(--black);
+    text-decoration: none; display: inline-flex;
+    align-items: center; gap: 6px;
+    letter-spacing: 0.02em;
+  }
+  .learn-more::after { content: '›'; font-size: 16px; }
+
+  /* Chat UI */
+  .chat-card {
+    background: var(--off-white);
+    border-radius: 20px;
+    padding: 28px;
+    border: 1px solid var(--warm-gray);
+  }
+  .chat-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--warm-gray);
+  }
+  .chat-avatar {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--warm-gray);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    overflow: hidden;
+  }
+  .chat-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .chat-name-zh { font-size: 16px; font-weight: 400; margin-bottom: 2px; }
+  .chat-name-en { font-size: 12px; color: var(--mid-gray); }
+  .chat-years { font-size: 11px; color: var(--mid-gray); margin-top: 2px; }
+  .chat-label {
+    margin-left: auto; font-size: 10px; color: var(--mid-gray);
+    letter-spacing: 0.05em;
+  }
+
+  .chat-messages { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+  .msg-received {
+    display: flex; flex-direction: column; align-items: flex-start;
+    background: var(--white);
+    border-radius: 16px 16px 16px 4px;
+    padding: 14px 18px;
+    max-width: 85%;
+  }
+  .msg-sent {
+    display: flex; flex-direction: column; align-items: flex-end;
+    background: var(--dark-gray); color: var(--white);
+    border-radius: 16px 16px 4px 16px;
+    padding: 14px 18px;
+    max-width: 85%;
+    align-self: flex-end;
+  }
+  .msg-zh { font-size: 14px; margin-bottom: 4px; }
+  .msg-en { font-size: 12px; opacity: 0.6; }
+  .wave {
+    display: flex; align-items: center; gap: 3px;
+    height: 16px; margin-top: 8px;
+  }
+  .wave span {
+    width: 2px; background: var(--mid-gray); border-radius: 2px;
+    animation: wave 1.2s ease-in-out infinite;
+  }
+  .wave span:nth-child(1) { height: 6px; animation-delay: 0s; }
+  .wave span:nth-child(2) { height: 10px; animation-delay: 0.15s; }
+  .wave span:nth-child(3) { height: 14px; animation-delay: 0.3s; }
+  .wave span:nth-child(4) { height: 10px; animation-delay: 0.45s; }
+  .wave span:nth-child(5) { height: 6px; animation-delay: 0.6s; }
+  .wave-white span { background: rgba(255,255,255,0.5); }
+  @keyframes wave {
+    0%, 100% { transform: scaleY(0.6); } 50% { transform: scaleY(1.2); }
+  }
+
+  .chat-input {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--white); border-radius: 24px;
+    padding: 12px 18px;
+    border: 1px solid var(--warm-gray);
+  }
+  .mic-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--black); display: flex;
+    align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .mic-btn svg { width: 14px; height: 14px; color: white; }
+  .chat-hint { font-size: 12px; color: var(--mid-gray); }
+
+  /* SPACE SECTION */
+  .space-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 60vh;
+    border-top: 1px solid var(--warm-gray);
+  }
+  .space-left {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 80px;
+  }
+  .space-right img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* STEPS */
+  .steps-section {
+    padding: 100px 80px;
+    background: var(--off-white);
+    border-top: 1px solid var(--warm-gray);
+  }
+  .steps-header { text-align: center; margin-bottom: 64px; }
+  .steps-title-zh {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(22px, 2.5vw, 32px);
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
+  .steps-title-en {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(18px, 2vw, 26px);
+    font-style: italic;
+    color: var(--dark-gray);
+  }
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    position: relative;
+  }
+  .steps-grid::before {
+    content: '';
+    position: absolute; top: 36px; left: 12.5%; right: 12.5%;
+    height: 1px; background: var(--warm-gray);
+  }
+  .step { padding: 0 24px; position: relative; }
+  .step-number {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--white); border: 1px solid var(--warm-gray);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: var(--mid-gray);
+    margin-bottom: 24px;
+    position: relative; z-index: 1;
+  }
+  .step-icon { width: 24px; height: 24px; color: var(--dark-gray); }
+  .step-name-zh {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 15px; font-weight: 400;
+    margin-bottom: 4px; letter-spacing: 0.04em;
+  }
+  .step-name-en { font-size: 11px; color: var(--mid-gray); margin-bottom: 12px; }
+  .step-sub-zh { font-size: 12px; color: var(--dark-gray); margin-bottom: 4px; letter-spacing: 0.02em; }
+  .step-sub-en { font-size: 11px; color: var(--mid-gray); line-height: 1.7; }
+
+  /* CTA BANNER */
+  .cta-banner {
+    padding: 64px 80px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid var(--warm-gray);
+    background: var(--white);
+  }
+  .cta-text-zh {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(16px, 2vw, 24px);
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
+  .cta-text-en { font-size: 13px; color: var(--mid-gray); }
+  .btn-cta {
+    background: var(--black); color: var(--white);
+    padding: 16px 32px; border-radius: 28px;
+    font-size: 14px; text-decoration: none;
+    white-space: nowrap; letter-spacing: 0.03em;
+    transition: opacity 0.2s; flex-shrink: 0;
+  }
+  .btn-cta:hover { opacity: 0.8; }
+
+  /* FOOTER */
+  footer {
+    padding: 40px 80px;
+    border-top: 1px solid var(--warm-gray);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--white);
+  }
+  .footer-logo { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .footer-copy { font-size: 11px; color: var(--mid-gray); margin-top: 4px; }
+  .footer-links { display: flex; gap: 32px; list-style: none; }
+  .footer-links a { font-size: 12px; color: var(--dark-gray); text-decoration: none; }
+  .footer-lang { font-size: 12px; color: var(--mid-gray); }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-left > * {
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards;
+  }
+  .hero-title-zh { animation-delay: 0.1s; }
+  .hero-title-en { animation-delay: 0.2s; }
+  .hero-desc-zh { animation-delay: 0.3s; }
+  .hero-desc-en { animation-delay: 0.35s; }
+  .hero-buttons { animation-delay: 0.45s; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <svg viewBox="0 0 814 1000" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 790.7 0 663 0 541.8c0-207.5 135.4-317.5 269-317.5 70.1 0 128.4 46.4 172.5 46.4 43.1 0 110.6-49 191.4-49 30.6 0 111.4 2.6 169.3 62.6zm-174.6-209.5c33.1-39.5 56.4-94.1 56.4-148.6 0-7.7-.6-15.4-1.9-21.7-53.9 2-117.9 36.1-157.6 80.6-31.3 35.2-59.2 89.8-59.2 145.1 0 8.3 1.3 16.6 1.9 19.2 3.2.6 8.4 1.3 13.6 1.3 48.1 0 108.2-33.2 146.8-75.9z"/>
+    </svg>
+    Apple Afterlife
+  </a>
+  <ul class="nav-links">
+    <li><a href="#">關於我們<span class="en">About</span></a></li>
+    <li><a href="#">服務項目<span class="en">Services</span></a></li>
+    <li><a href="#">儀式體驗<span class="en">Ceremony</span></a></li>
+    <li><a href="#">數位紀念館<span class="en">Memorial</span></a></li>
+    <li><a href="#">支援與諮詢<span class="en">Support</span></a></li>
+  </ul>
+  <a href="#" class="nav-cta">報名諮詢 Register</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <h1 class="hero-title-zh">科技，讓回憶永恆。</h1>
+    <div class="hero-title-en">Technology keeps<br>memories alive.</div>
+    <p class="hero-desc-zh">我們重新定義告別的方式，<br>用科技保存每段珍貴回憶，<br>讓愛以另一種形式延續。</p>
+    <p class="hero-desc-en">We redefine the way we say goodbye.<br>With technology, we preserve every precious memory<br>and keep love alive in a new form.</p>
+    <div class="hero-buttons">
+      <a href="#" class="btn-primary">報名諮詢 Register</a>
+      <a href="#" class="btn-secondary">了解更多 Learn more</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <img src="p1.png" alt="White lily in vase">
+  </div>
+  <div class="scroll-indicator">
+    <div class="scroll-dot"></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="features-grid">
+    <div class="feature-item">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+          <line x1="12" y1="18" x2="12.01" y2="18"/>
+        </svg>
+      </div>
+      <div class="feature-name-zh">數位遺思館</div>
+      <div class="feature-name-en">Digital Memorial</div>
+      <p class="feature-desc-zh">保存影像、語音與故事，<br>讓回憶永遠留存。</p>
+      <p class="feature-desc-en">Preserve photos, voices,<br>and stories forever.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 18V5l12-2v13"/>
+          <circle cx="6" cy="18" r="3"/>
+          <circle cx="18" cy="16" r="3"/>
+        </svg>
+      </div>
+      <div class="feature-name-zh">客製化儀式體驗</div>
+      <div class="feature-name-en">Personalized Ceremony</div>
+      <p class="feature-desc-zh">結合光影、音樂與設計，<br>打造專屬的告別儀式。</p>
+      <p class="feature-desc-en">Combine light, music, and design<br>to create a unique farewell.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+      </div>
+      <div class="feature-name-zh">永恆記憶庫</div>
+      <div class="feature-name-en">Memory Vault</div>
+      <p class="feature-desc-zh">雲端保存珍貴回憶，<br>家人可隨時追思。</p>
+      <p class="feature-desc-en">Securely store memories in the cloud<br>for family to revisit anytime.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </div>
+      <div class="feature-name-zh">AI 語音重現</div>
+      <div class="feature-name-en">AI Voice Reconnect</div>
+      <p class="feature-desc-zh">通過 AI 語音技術，<br>重現摯愛的聲音與對話。</p>
+      <p class="feature-desc-en">AI voice technology brings back<br>voices and conversations.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+      </div>
+      <div class="feature-name-zh">遠距參與</div>
+      <div class="feature-name-en">Live Connection</div>
+      <p class="feature-desc-zh">無論距離多遠，<br>都能一起送上最後的祝福。</p>
+      <p class="feature-desc-en">No matter the distance,<br>we can say goodbye together.</p>
+    </div>
+  </div>
+</section>
+
+<!-- AI SECTION -->
+<section class="ai-section">
+  <div class="ai-left">
+    <div class="tag">全新功能 New Feature</div>
+    <h2 class="section-title-zh">AI 語音重現，讓愛再次聽見</h2>
+    <div class="section-title-en">AI Voice Reconnect,<br>Love Speaks Again.</div>
+    <p class="section-desc-zh">透過先進的 AI 語音技術，<br>我們能重現往生者的聲音，進行自然對話，<br>讓思念不再沉默。</p>
+    <p class="section-desc-en">With advanced AI voice technology,<br>we recreate the voice of your loved one,<br>allowing natural conversations<br>and keeping the connection alive.</p>
+    <a href="#" class="learn-more">了解更多 Learn more</a>
+  </div>
+  <div class="ai-right">
+    <div class="chat-card">
+      <div class="chat-header">
+        <div class="chat-avatar">👴</div>
+        <div>
+          <div class="chat-name-zh">爸爸 Dad</div>
+          <div class="chat-years">1950 – 2023</div>
+        </div>
+        <div class="chat-label">語音對話 Voice Chat</div>
+      </div>
+      <div class="chat-messages">
+        <div class="msg-received">
+          <div class="msg-zh">寶貝，最近過得好嗎？</div>
+          <div class="msg-en">Hey, how have you been lately?</div>
+          <div class="wave">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <div class="msg-sent">
+          <div class="msg-zh">我很好，想你了。</div>
+          <div class="msg-en">I'm doing well, I miss you.</div>
+          <div class="wave wave-white">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+      <div class="chat-input">
+        <div class="mic-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          </svg>
+        </div>
+        <span class="chat-hint">按住說話 Hold to talk</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPACE SECTION -->
+<section class="space-section">
+  <div class="space-left">
+    <h2 class="section-title-zh">極簡空間，傳遞最深的思念</h2>
+    <div class="section-title-en">A Space of Simplicity,<br>A Heartfelt Goodbye.</div>
+    <p class="section-desc-zh">我們打造純淨、寧靜的儀式空間，<br>讓每一次告別，都成為最溫柔的回憶。</p>
+    <p class="section-desc-en">We create serene and elegant spaces<br>to honor life and celebrate love.</p>
+  </div>
+  <div class="space-right">
+    <img src="p2.png" alt="Ceremony space">
+  </div>
+</section>
+
+<!-- STEPS -->
+<section class="steps-section">
+  <div class="steps-header">
+    <div class="steps-title-zh">簡單四步驟，完成專屬安排</div>
+    <div class="steps-title-en">Four Simple Steps to Get Started</div>
+  </div>
+  <div class="steps-grid">
+    <div class="step">
+      <div class="step-number">
+        <svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <div class="step-name-zh">1. 預約諮詢</div>
+      <div class="step-name-en">Consultation</div>
+      <p class="step-sub-zh">線上預約，專員與您聯繫</p>
+      <p class="step-sub-en">Book online and our specialist<br>will contact you.</p>
+    </div>
+    <div class="step">
+      <div class="step-number">
+        <svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+      </div>
+      <div class="step-name-zh">2. 了解需求</div>
+      <div class="step-name-en">Understanding</div>
+      <p class="step-sub-zh">專屬顧問提供伴侶細說明</p>
+      <p class="step-sub-en">Our advisor will understand<br>your needs and provide details.</p>
+    </div>
+    <div class="step">
+      <div class="step-number">
+        <svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+      </div>
+      <div class="step-name-zh">3. 規劃儀式</div>
+      <div class="step-name-en">Planning</div>
+      <p class="step-sub-zh">客製化設計專屬告別儀式</p>
+      <p class="step-sub-en">We design a personalized<br>ceremony just for you.</p>
+    </div>
+    <div class="step">
+      <div class="step-number">
+        <svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+      </div>
+      <div class="step-name-zh">4. 安心交付</div>
+      <div class="step-name-en">Completion</div>
+      <p class="step-sub-zh">完整服務，陪伴每一步</p>
+      <p class="step-sub-en">We take care of everything<br>with care and compassion.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner">
+  <div>
+    <div class="cta-text-zh">讓我們陪伴您，為摯愛留下最美的句點。</div>
+    <div class="cta-text-en">Let us accompany you to create the most beautiful farewell.</div>
+  </div>
+  <a href="#" class="btn-cta">立即報名諮詢 Register Now</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-logo">
+      <svg width="16" height="16" viewBox="0 0 814 1000" fill="currentColor">
+        <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 790.7 0 663 0 541.8c0-207.5 135.4-317.5 269-317.5 70.1 0 128.4 46.4 172.5 46.4 43.1 0 110.6-49 191.4-49 30.6 0 111.4 2.6 169.3 62.6zm-174.6-209.5c33.1-39.5 56.4-94.1 56.4-148.6 0-7.7-.6-15.4-1.9-21.7-53.9 2-117.9 36.1-157.6 80.6-31.3 35.2-59.2 89.8-59.2 145.1 0 8.3 1.3 16.6 1.9 19.2 3.2.6 8.4 1.3 13.6 1.3 48.1 0 108.2-33.2 146.8-75.9z"/>
+      </svg>
+      Apple Afterlife
+    </div>
+    <div class="footer-copy">© 2024 Apple Afterlife. All rights reserved.</div>
+  </div>
+  <ul class="footer-links">
+    <li><a href="#">隱私權政策<br><span style="font-size:10px;color:var(--mid-gray)">Privacy Policy</span></a></li>
+    <li><a href="#">使用條款<br><span style="font-size:10px;color:var(--mid-gray)">Terms of Use</span></a></li>
+    <li><a href="#">常見問題<br><span style="font-size:10px;color:var(--mid-gray)">FAQ</span></a></li>
+  </ul>
+  <div class="footer-lang">繁體中文 · English</div>
+</footer>
+
+</body>
+</html>
