@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sphere Chess Game</title>
+<style>
+  body { margin:0; overflow:hidden; background:#111; }
+  #info {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: white;
+    font-family: sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<div id="info">Turn: RED</div>
+
+<script type="module">
+import * as THREE from "https://unpkg.com/three@0.158.0/build/three.module.js";
+import { OrbitControls } from "https://unpkg.com/three@0.158.0/examples/jsm/controls/OrbitControls.js";
+
+// ===== 基本 =====
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x111111);
+
+const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
+camera.position.set(0,0,10);
+
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+
+// ===== 光 =====
+scene.add(new THREE.AmbientLight(0xffffff,0.6));
+const light = new THREE.DirectionalLight(0xffffff,1);
+light.position.set(5,5,5);
+scene.add(light);
+
+// ===== 球 =====
+const radius = 3;
+const sphere = new THREE.Mesh(
+  new THREE.SphereGeometry(radius,64,64),
+  new THREE.MeshBasicMaterial({wireframe:true,color:0x4444ff})
+);
+scene.add(sphere);
+
+// ===== 格子 =====
+const latSteps = 6;
+const lonSteps = 12;
+
+function latLonToVec(lat, lon, r){
+  const phi = (90-lat)*Math.PI/180;
+  const theta = (lon+180)*Math.PI/180;
+  return new THREE.Vector3(
+    -r*Math.sin(phi)*Math.cos(theta),
+    r*Math.cos(phi),
+    r*Math.sin(phi)*Math.sin(theta)
+  );
+}
+
+// ===== 棋子 =====
+let pieces = [];
+let currentTurn = "red";
+let selected = null;
+
+function createPiece(latIndex, lonIndex, color){
+  const mesh = new THREE.Mesh(
+    new THREE.SphereGeometry(0.25,16,16),
+    new THREE.MeshStandardMaterial({color})
+  );
+
+  const lat = -75 + latIndex*(150/latSteps);
+  const lon = lonIndex*(360/lonSteps);
+
+  mesh.position.copy(latLonToVec(lat,lon,radius+0.3));
+
+  scene.add(mesh);
+
+  pieces.push({
+    mesh,
+    latIndex,
+    lonIndex,
+    color: color === 0xff0000 ? "red":"green"
+  });
+}
+
+// 初始棋子
+createPiece(0,0,0xff0000);
+createPiece(0,1,0xff0000);
+createPiece(latSteps,6,0x00ff00);
+createPiece(latSteps,7,0x00ff00);
+
+// ===== Raycaster =====
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+window.addEventListener("click",(e)=>{
+  mouse.x = (e.clientX/innerWidth)*2-1;
+  mouse.y = -(e.clientY/innerHeight)*2+1;
+
+  raycaster.setFromCamera(mouse,camera);
+
+  const intersects = raycaster.intersectObjects([
+    ...pieces.map(p=>p.mesh),
+    sphere
+  ]);
+
+  if(intersects.length===0) return;
+
+  const obj = intersects[0].object;
+
+  // 點棋子
+  const piece = pieces.find(p=>p.mesh===obj);
+
+  if(piece){
+    if(piece.color !== currentTurn) return;
+
+    selected = piece;
+    piece.mesh.material.emissive.set(0xffff00);
+    return;
+  }
+
+  // 點地面（移動）
+  if(selected){
+    const point = intersects[0].point;
+
+    // 找最近格子
+    let best = null;
+    let bestDist = Infinity;
+
+    for(let i=0;i<=latSteps;i++){
+      for(let j=0;j<lonSteps;j++){
+        const lat = -75 + i*(150/latSteps);
+        const lon = j*(360/lonSteps);
+        const pos = latLonToVec(lat,lon,radius);
+
+        const d = pos.distanceTo(point);
+        if(d < bestDist){
+          bestDist = d;
+          best = {i,j,pos};
+        }
+      }
+    }
+
+    // 檢查合法移動（只允許一步）
+    const di = Math.abs(best.i - selected.latIndex);
+    const dj = Math.abs(best.j - selected.lonIndex);
+
+    if(di <=1 && dj <=1){
+      selected.latIndex = best.i;
+      selected.lonIndex = best.j;
+
+      selected.mesh.position.copy(
+        latLonToVec(
+          -75 + best.i*(150/latSteps),
+          best.j*(360/lonSteps),
+          radius+0.3
+        )
+      );
+
+      // 換回合
+      currentTurn = currentTurn==="red"?"green":"red";
+      document.getElementById("info").innerText = "Turn: " + currentTurn.toUpperCase();
+    }
+
+    selected.mesh.material.emissive.set(0x000000);
+    selected = null;
+  }
+
+});
+
+// ===== animate =====
+function animate(){
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene,camera);
+}
+animate();
+
+// ===== resize =====
+window.addEventListener("resize",()=>{
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+</script>
+
+</body>
+</html>
